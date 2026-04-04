@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOKER</title>
+
+    <!-- Branding & Assets -->
+    <link rel="icon" type="image/png" href="/static/favicon.png">
+    <link rel="stylesheet" href="/static/style.css">
+
+    <!-- Google Fonts: Orbitron (Cyberpunk) & Roboto Mono (Cards) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Visual Effect Overlay -->
+    <div class="scanlines"></div>
+
+    <div id="app">
+
+        <!-- Screen 1: START MENU -->
+        <div id="start-screen" class="screen">
+            <h1 class="title-glow">JOKER</h1>
+            <div class="dev-name">Developer : RoSY</div>
+
+            <!-- Spacer for visual balance without visible lines -->
+            <div style="height: 40px;"></div>
+
+            <div class="controls">
+                <label>OPPONENTS: <input type="number" id="bot-count" value="3" min="1" max="5"></label>
+                <button id="start-btn" onclick="startGame()">ENTER GAME</button>
+            </div>
+
+            <div class="rules">
+                <h3>RULES</h3>
+                <ul>
+                    <li>Discard pairs of SAME COLOR to survive.</li>
+                    <li>Draw cards from your neighbor.</li>
+                    <li>OBJECTIVE: Be the last one holding the JOKER.</li>
+                    <li>WARNING: Losing the JOKER causes ELIMINATION.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Screen 2: GAMEPLAY -->
+        <div id="game-screen" class="screen hidden">
+            <div class="top-bar">
+                <div class="top-middle">
+                    <button class="restart-btn-main" onclick="location.reload()">RESTART</button>
+                </div>
+            </div>
+
+            <!-- Opponent Hands (Top) -->
+            <div id="opponents-container" class="opponents-row">
+                <!-- Javascript will inject Bot HTML here -->
+            </div>
+
+            <!-- Center Table (Discard Pile / Messages) -->
+            <div class="center-table">
+                <div id="discard-pile" class="table-center"></div>
+                <!-- Dynamic Overlay Message (e.g. "DREW 4-H") -->
+                <div id="message-area" class="message-overlay hidden"></div>
+            </div>
+
+            <!-- Player Hand (Bottom) -->
+            <div id="player-container" class="player-area">
+                <div class="player-info">
+                    <span id="p-status">ALIVE</span>
+                </div>
+                <div id="player-hand" class="hand">
+                    <!-- Javascript will inject Player Cards here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 3: GAME OVER -->
+        <div id="end-screen" class="screen hidden">
+            <h1 id="end-title">GAME OVER</h1>
+            <p id="end-message"></p>
+            <button onclick="location.reload()">PLAY AGAIN</button>
+        </div>
+    </div>
+
+    <!-- Frontend Logic -->
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
