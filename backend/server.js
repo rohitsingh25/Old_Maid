@@ -424,6 +424,7 @@ function handlePlayerLeave(socket, roomCode) {
       // Delete room if empty
       if (room.botTimeout) clearTimeout(room.botTimeout);
       delete rooms[roomCode];
+      broadcastActiveRoomsCount();
       return;
     }
     
@@ -474,6 +475,7 @@ function handlePlayerLeave(socket, roomCode) {
     if (activeHumans.length === 0) {
       if (room.botTimeout) clearTimeout(room.botTimeout);
       delete rooms[roomCode];
+      broadcastActiveRoomsCount();
       return;
     }
     
@@ -484,9 +486,17 @@ function handlePlayerLeave(socket, roomCode) {
   delete socket.roomCode;
 }
 
+// Helper: Broadcast number of active game rooms
+function broadcastActiveRoomsCount() {
+  io.emit('activeRoomsCount', Object.keys(rooms).length);
+}
+
 // Socket IO Event Listeners
 io.on('connection', (socket) => {
   console.log(`Socket connected: ${socket.id}`);
+  
+  // Send current active tables count to the newly connected socket
+  socket.emit('activeRoomsCount', Object.keys(rooms).length);
   
   // Event: Create Room
   socket.on('createRoom', ({ playerName }) => {
@@ -521,6 +531,7 @@ io.on('connection', (socket) => {
     
     socket.emit('roomCreated', { code, playerId: socket.id });
     broadcastLobby(rooms[code]);
+    broadcastActiveRoomsCount();
   });
   
   // Event: Join Room

@@ -24,6 +24,9 @@
 
         <!-- Screen 1: LANDING & JOIN/CREATE -->
         <div id="start-screen" class="screen">
+            <div class="active-tables-counter">
+                ACTIVE TABLES: <span id="active-tables-count">0</span>
+            </div>
             <h1 class="title-glow">JOKER</h1>
             <div class="dev-name">Developer : RoSY</div>
 
@@ -139,8 +142,8 @@
     <!-- Error/Alert Dialog Toast -->
     <div id="toast" class="toast hidden"></div>
 
-    <!-- Socket.IO client library -->
-    <script src="/socket.io/socket.io.js"></script>
+    <!-- Socket.IO client library (CDN version to support Vercel static hosting) -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <!-- Frontend Logic -->
     <script src="/static/script.js"></script>
 </body>

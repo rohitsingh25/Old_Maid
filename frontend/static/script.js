@@ -89,6 +89,13 @@ socket.on('drawNotification', (data) => {
     handleDrawNotification(data);
 });
 
+socket.on('activeRoomsCount', (count) => {
+    const el = document.getElementById('active-tables-count');
+    if (el) {
+        el.innerText = count;
+    }
+});
+
 // --- LOBBY ACTIONS ---
 
 function createRoom() {

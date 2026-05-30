@@ -87,6 +87,28 @@ body::after {
     z-index: 50;
 }
 
+/* Active Tables Counter */
+.active-tables-counter {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    color: #888;
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 8px 16px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
+    letter-spacing: 1px;
+}
+
+.active-tables-counter span {
+    color: var(--primary-cyan);
+    text-shadow: 0 0 5px var(--primary-cyan);
+    font-weight: bold;
+}
+
 #lobby-screen {
     background: rgba(0, 0, 0, 0.9);
     z-index: 55;
