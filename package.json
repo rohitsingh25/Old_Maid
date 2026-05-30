@@ -1,0 +1,9 @@
+{
+  "name": "old-maid-multiplayer",
+  "version": "1.0.0",
+  "description": "Multiplayer JOKER Card Game",
+  "scripts": {
+    "postinstall": "npm install --prefix backend",
+    "start": "node backend/server.js"
+  }
+}

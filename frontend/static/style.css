@@ -1,0 +1,1043 @@
+/* =========================================
+   CORE THEME VARIABLES
+   ========================================= */
+:root {
+    --bg-color: #050505;
+    --text-color: #e0e0e0;
+    --primary-red: #ff0033;
+    /* Neon Red for Joker/Danger */
+    --primary-cyan: #00f3ff;
+    /* Neon Cyan for Player/Safe */
+    --card-bg: #1a1a1a;
+    --card-width: 90px;
+    --card-height: 135px;
+}
+
+/* =========================================
+   GLOBAL STYLES & BACKGROUND
+   ========================================= */
+body {
+    margin: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Roboto Mono', monospace;
+    overflow: hidden;
+    height: 100vh;
+    background-image: url('/static/table_bg.png');
+    background-size: cover;
+    background-position: center;
+}
+
+/* Vignette Effect */
+body::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, transparent 40%, #000 100%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* CRT Scanline Effect Overlay */
+.scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0) 50%,
+            rgba(0, 0, 0, 0.1) 50%,
+            rgba(0, 0, 0, 0.1));
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.3;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    backdrop-filter: brightness(0.7);
+}
+
+/* =========================================
+   SCREEN MANAGERS (Start/Lobby/Game/End)
+   ========================================= */
+.screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.5s;
+}
+
+#start-screen {
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 50;
+}
+
+#lobby-screen {
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 55;
+}
+
+#end-screen {
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 60;
+}
+
+.hidden {
+    display: none !important;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Typography */
+h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 5rem;
+    color: var(--primary-red);
+    text-shadow: 0 0 15px var(--primary-red);
+    margin: 0;
+    letter-spacing: 5px;
+    position: relative;
+}
+
+h2, h3 {
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 2px;
+    margin-top: 0;
+}
+
+.title-glow {
+    animation: pulseGlow 2s infinite alternate;
+}
+
+@keyframes pulseGlow {
+    from {
+        text-shadow: 0 0 10px var(--primary-red), 0 0 20px var(--primary-red);
+    }
+    to {
+        text-shadow: 0 0 15px var(--primary-red), 0 0 30px var(--primary-red), 0 0 5px white;
+    }
+}
+
+.dev-name {
+    margin-top: 10px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    color: #666;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.subtitle {
+    font-size: 1.8rem;
+    color: #888;
+    margin-bottom: 1.5rem;
+    font-family: 'Orbitron';
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.glow-text {
+    color: var(--primary-cyan);
+    text-shadow: 0 0 8px var(--primary-cyan);
+    font-family: 'Orbitron';
+    font-weight: bold;
+}
+
+/* =========================================
+   CONTROLS PANEL & INTERACTIVE ELEMENTS
+   ========================================= */
+.controls-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 2.5rem 3.5rem;
+    border: 1px solid var(--primary-red);
+    box-shadow: 0 0 25px rgba(255, 0, 51, 0.2), inset 0 0 20px rgba(255, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    max-width: 600px;
+    width: 85%;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.input-group label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    color: #888;
+    letter-spacing: 1px;
+}
+
+.input-group input[type="text"] {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #ff0033;
+    color: white;
+    padding: 10px 15px;
+    font-size: 1.2rem;
+    width: auto;
+    text-align: left;
+    font-family: 'Roboto Mono', monospace;
+    letter-spacing: 1px;
+    box-shadow: inset 0 0 5px rgba(255, 0, 51, 0.2);
+}
+
+.input-group input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-cyan);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.4), inset 0 0 5px rgba(0, 243, 255, 0.2);
+}
+
+.divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 0, 51, 0.4), transparent);
+    width: 100%;
+}
+
+.actions-row {
+    display: flex;
+    gap: 2.5rem;
+}
+
+.action-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.action-box h3 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: #aaa;
+}
+
+button {
+    background: transparent;
+    border: 2px solid var(--primary-red);
+    color: var(--primary-red);
+    padding: 12px 30px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    text-align: center;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 0, 51, 0.4), transparent);
+    transition: 0.5s;
+}
+
+button:hover::before {
+    left: 100%;
+}
+
+button:hover {
+    background: var(--primary-red);
+    color: black;
+    box-shadow: 0 0 30px var(--primary-red);
+    text-shadow: none;
+}
+
+button.leave-btn {
+    border-color: #666;
+    color: #888;
+}
+
+button.leave-btn:hover {
+    background: #666;
+    color: white;
+    box-shadow: 0 0 20px #666;
+}
+
+input {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #444;
+    color: white;
+    padding: 10px;
+    font-size: 1.2rem;
+    text-align: center;
+    font-family: 'Orbitron';
+    border-radius: 4px;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary-cyan);
+}
+
+.rules {
+    margin-top: 2rem;
+    max-width: 600px;
+    color: #666;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.rules h3 {
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.rules ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.rules li {
+    margin-bottom: 4px;
+}
+
+/* =========================================
+   LOBBY SCREEN STYLING
+   ========================================= */
+.room-code-display {
+    font-family: 'Orbitron';
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    letter-spacing: 2px;
+}
+
+.lobby-container {
+    display: flex;
+    gap: 3rem;
+    width: 85%;
+    max-width: 800px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--primary-cyan);
+    box-shadow: 0 0 25px rgba(0, 243, 255, 0.1);
+    padding: 2.5rem;
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+}
+
+.lobby-players {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+.lobby-players h3 {
+    color: var(--primary-cyan);
+    border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+#players-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+#players-list li {
+    padding: 12px 18px;
+    border: 1px solid #222;
+    background: rgba(10, 10, 10, 0.5);
+    margin-bottom: 8px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 4px;
+}
+
+.player-name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.host-badge {
+    color: #ffaa00;
+    border: 1px solid #ffaa00;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    font-family: 'Orbitron';
+    letter-spacing: 1px;
+    border-radius: 3px;
+    text-shadow: 0 0 4px rgba(255, 170, 0, 0.4);
+}
+
+.bot-badge {
+    color: #888;
+    border: 1px solid #444;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    font-family: 'Orbitron';
+    letter-spacing: 1px;
+    border-radius: 3px;
+}
+
+.kick-btn {
+    background: transparent;
+    border: 1px solid #555;
+    color: #888;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    width: auto;
+}
+
+.kick-btn:hover {
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+    background: rgba(255, 0, 51, 0.1);
+    box-shadow: 0 0 8px rgba(255, 0, 51, 0.3);
+}
+
+.lobby-controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    justify-content: center;
+}
+
+.lobby-controls button {
+    border-color: var(--primary-cyan);
+    color: var(--primary-cyan);
+}
+
+.lobby-controls button:hover {
+    background: var(--primary-cyan);
+    color: black;
+    box-shadow: 0 0 25px var(--primary-cyan);
+}
+
+.lobby-controls button.leave-btn {
+    border-color: #666;
+    color: #888;
+}
+
+.lobby-controls button.leave-btn:hover {
+    background: #444;
+    color: white;
+    box-shadow: 0 0 15px #666;
+}
+
+/* =========================================
+   GAME BOARD LAYOUT & TOP BAR
+   ========================================= */
+#game-screen {
+    justify-content: space-between;
+    padding: 0;
+}
+
+.top-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+    position: absolute;
+    top: 0;
+    box-sizing: border-box;
+    z-index: 100;
+}
+
+.room-indicator {
+    font-family: 'Orbitron';
+    font-size: 1.1rem;
+    color: #aaa;
+    letter-spacing: 1px;
+}
+
+.room-indicator span {
+    color: var(--primary-cyan);
+    text-shadow: 0 0 8px var(--primary-cyan);
+    font-weight: bold;
+}
+
+.top-middle {
+    display: flex;
+    gap: 15px;
+}
+
+.top-middle button {
+    font-size: 0.8rem;
+    padding: 8px 20px;
+    width: auto;
+}
+
+#end-game-btn {
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+}
+
+#end-game-btn:hover {
+    background: var(--primary-red);
+    color: black;
+    box-shadow: 0 0 20px var(--primary-red);
+}
+
+#leave-game-btn {
+    border-color: #666;
+    color: #888;
+}
+
+#leave-game-btn:hover {
+    background: #666;
+    color: white;
+    box-shadow: 0 0 15px #666;
+}
+
+/* =========================================
+   OPPONENTS AREA (Arranged gracefully)
+   ========================================= */
+#opponents-container {
+    flex: 1;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 25px 40px;
+    max-width: 95%;
+    margin: 0 auto;
+    padding-top: 80px;
+    z-index: 20;
+    pointer-events: none;
+}
+
+#opponents-container>* {
+    pointer-events: auto;
+}
+
+.opponent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.4s ease;
+    opacity: 0.75;
+    position: relative;
+}
+
+.opponent.is-turn {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.opponent.is-turn::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -15px;
+    right: -15px;
+    bottom: -10px;
+    border: 1px solid var(--primary-cyan);
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.4), inset 0 0 10px rgba(0, 243, 255, 0.2);
+    pointer-events: none;
+    animation: pulseBorder 1.5s infinite alternate;
+}
+
+@keyframes pulseBorder {
+    from { opacity: 0.4; }
+    to { opacity: 1; }
+}
+
+.opponent.out {
+    opacity: 0.45;
+}
+
+.opponent.eliminated-bot {
+    opacity: 0.3;
+    filter: grayscale(100%) brightness(0.5);
+}
+
+/* DECK MODE - Default for non-active/non-target bots */
+.opponent-hand {
+    display: flex;
+    justify-content: center;
+    height: 140px;
+    perspective: 1000px;
+    transition: all 0.4s ease;
+}
+
+/* EXPANDED MODE - Selection View */
+.opponent-hand.expanded {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw !important;
+    height: 60vh !important;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(15px);
+    border: 2px solid var(--primary-cyan);
+    box-shadow: 0 0 50px rgba(0, 243, 255, 0.5);
+    z-index: 999;
+    padding: 20px;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    overflow-x: auto;
+    border-radius: 8px;
+}
+
+.opponent-hand.deck {
+    width: var(--card-width) !important;
+}
+
+/* Expanded Mode Card Styles */
+.opponent-hand.expanded .card {
+    position: static !important;
+    transform: none !important;
+    margin: 0 !important;
+    width: 130px;
+    height: 195px;
+    border: 2px solid var(--primary-cyan);
+    box-shadow: 0 0 20px var(--primary-cyan);
+    flex-shrink: 0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.opponent-hand.expanded .card:hover {
+    transform: scale(1.1) translateY(-10px) !important;
+    z-index: 1000;
+    box-shadow: 0 0 45px var(--primary-cyan);
+    background-color: #2b2b2b;
+}
+
+/* Deck Mode Card Styles (Stacked) */
+.opponent-hand.deck .card {
+    position: absolute;
+    margin-left: 0;
+    transform: rotate(var(--deck-rot)) translateX(var(--deck-x)) !important;
+}
+
+.bot-avatar-display {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #111;
+    border: 1px solid #444;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 1.3rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
+.opponent.is-turn .bot-avatar-display {
+    border-color: var(--primary-cyan);
+    box-shadow: 0 0 10px var(--primary-cyan);
+}
+
+.opponent.eliminated-bot .bot-avatar-display {
+    border-color: var(--primary-red);
+}
+
+.bot-name-label {
+    font-family: 'Orbitron';
+    font-size: 0.9rem;
+    color: #fff;
+    margin-bottom: 4px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.bot-status {
+    font-size: 0.8rem;
+    margin-top: 4px;
+    font-family: 'Orbitron';
+    color: var(--primary-cyan);
+    text-shadow: 0 0 5px var(--primary-cyan);
+    font-weight: bold;
+}
+
+.opponent.out .bot-status {
+    color: #555;
+    text-shadow: none;
+}
+
+.opponent.eliminated-bot .bot-status {
+    color: var(--primary-red);
+    text-shadow: 0 0 5px var(--primary-red);
+}
+
+/* =========================================
+   CENTER TABLE & LOGS PANEL
+   ========================================= */
+.center-table {
+    flex: 1;
+    position: relative;
+    width: 100%;
+    min-height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+}
+
+.table-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 250px;
+    height: 250px;
+    pointer-events: none;
+}
+
+.discard-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: calc(var(--card-width) * -0.5);
+    margin-top: calc(var(--card-height) * -0.5);
+    width: var(--card-width);
+    height: var(--card-height);
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    border: 1px solid #444;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px;
+    box-sizing: border-box;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: white;
+    transition: all 0.3s;
+}
+
+.message-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2.2rem;
+    font-family: 'Orbitron';
+    color: white;
+    background: rgba(0, 0, 0, 0.95);
+    padding: 30px 60px;
+    border: 2px solid var(--primary-cyan);
+    box-shadow: 0 0 50px var(--primary-cyan);
+    z-index: 200;
+    pointer-events: none;
+    text-align: center;
+    border-radius: 4px;
+}
+
+.message-overlay.joker-snatch {
+    border-color: var(--primary-red);
+    box-shadow: 0 0 50px var(--primary-red);
+}
+
+/* Semi-transparent Cyberpunk Log Terminal on the Side */
+.game-logs-overlay {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 280px;
+    height: 200px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.75rem;
+    color: #888;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    pointer-events: auto;
+}
+
+.logs-header {
+    background: rgba(0, 243, 255, 0.1);
+    color: var(--primary-cyan);
+    padding: 6px 12px;
+    font-family: 'Orbitron';
+    font-weight: bold;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+}
+
+.logs-content {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+}
+
+.logs-content div {
+    line-height: 1.3;
+}
+
+/* =========================================
+   PLAYER & HAND AREA
+   ========================================= */
+.player-area {
+    height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.95) 0%, transparent 100%);
+    width: 100%;
+    padding-bottom: 15px;
+    box-sizing: border-box;
+    z-index: 25;
+}
+
+.player-info {
+    font-family: 'Orbitron';
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: #aaa;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+#p-name {
+    color: #fff;
+}
+
+#p-status {
+    color: var(--primary-cyan);
+    text-shadow: 0 0 5px var(--primary-cyan);
+    font-weight: bold;
+}
+
+.player-area.is-turn {
+    background: linear-gradient(0deg, rgba(0, 243, 255, 0.15) 0%, transparent 100%);
+}
+
+.player-area.is-turn .player-info {
+    color: #fff;
+    text-shadow: 0 0 5px var(--primary-cyan);
+}
+
+.hand {
+    display: flex;
+    justify-content: center;
+    padding: 15px 40px;
+    perspective: 1000px;
+    height: var(--card-height);
+}
+
+/* Card Base Style */
+.card {
+    width: var(--card-width);
+    height: var(--card-height);
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px;
+    box-sizing: border-box;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: white;
+    cursor: default;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s, border-color 0.3s;
+    user-select: none;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
+    margin: 0 -25px;
+    /* Overlap cards for fan effect */
+    transform-origin: bottom center;
+    transform: rotate(var(--rot, 0deg)) translateY(var(--y, 0px));
+}
+
+.card.interactive {
+    cursor: pointer;
+}
+
+/* Player Card Hover (Pop up) */
+.hand .card:hover {
+    transform: translateY(-40px) scale(1.15) rotate(0deg) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+    z-index: 100;
+    border-color: var(--primary-cyan);
+}
+
+/* Card Content: Standard Layout Corner Fixes */
+.card-content-top {
+    align-self: flex-start;
+    line-height: normal;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-rank {
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.card-suit {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.card-content-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3.5rem;
+}
+
+.card-content-bottom {
+    align-self: flex-end;
+    transform: rotate(180deg);
+    line-height: normal;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card.back {
+    background-image: url('/static/back.png');
+    background-size: cover;
+    background-position: center;
+    border: 1px solid #444;
+}
+
+.card.joker {
+    background-image: url('/static/joker.png');
+    background-size: cover;
+    background-position: center;
+    border: 2px solid var(--primary-red);
+    box-shadow: 0 0 20px rgba(255, 0, 51, 0.4);
+}
+
+.card-red {
+    color: #ff5555;
+}
+
+.card-black {
+    color: #eaeaea;
+}
+
+/* =========================================
+   TOASTS & RESPONSIVE TWEAKS
+   ========================================= */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 0, 51, 0.95);
+    border: 1px solid var(--primary-red);
+    box-shadow: 0 0 20px rgba(255, 0, 51, 0.4);
+    color: white;
+    padding: 12px 30px;
+    font-family: 'Orbitron';
+    font-size: 0.95rem;
+    border-radius: 4px;
+    z-index: 1000;
+    letter-spacing: 1px;
+    animation: toastPopIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes toastPopIn {
+    from {
+        bottom: -50px;
+        opacity: 0;
+    }
+    to {
+        bottom: 30px;
+        opacity: 1;
+    }
+}
+
+/* Animations */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -40%) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* Responsive Scaling for smaller heights or screens */
+@media (max-width: 900px) {
+    h1 {
+        font-size: 3.5rem;
+    }
+    .lobby-container {
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+    .game-logs-overlay {
+        position: static;
+        transform: none;
+        width: calc(100% - 60px);
+        margin: 15px auto;
+        height: 100px;
+    }
+    #opponents-container {
+        padding-top: 70px;
+        gap: 15px 25px;
+    }
+}

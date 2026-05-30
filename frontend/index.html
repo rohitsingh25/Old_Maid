@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOKER Multiplayer</title>
+
+    <!-- Branding & Assets -->
+    <link rel="icon" type="image/png" href="/static/favicon.png">
+    <link rel="stylesheet" href="/static/style.css">
+
+    <!-- Google Fonts: Orbitron (Cyberpunk) & Roboto Mono (Cards) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Visual Effect Overlay -->
+    <div class="scanlines"></div>
+
+    <div id="app">
+
+        <!-- Screen 1: LANDING & JOIN/CREATE -->
+        <div id="start-screen" class="screen">
+            <h1 class="title-glow">JOKER</h1>
+            <div class="dev-name">Developer : RoSY</div>
+
+            <div style="height: 25px;"></div>
+
+            <div class="controls-panel">
+                <div class="input-group">
+                    <label for="player-name">YOUR NAME:</label>
+                    <input type="text" id="player-name" placeholder="Name..." maxlength="12">
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="actions-row">
+                    <div class="action-box">
+                        <h3>HOST GAME</h3>
+                        <button id="create-room-btn" onclick="createRoom()">CREATE TABLE</button>
+                    </div>
+                    
+                    <div class="action-box">
+                        <h3>JOIN GAME</h3>
+                        <input type="text" id="room-code" placeholder="4-Digit Code" maxlength="4" style="width: 140px; margin-bottom: 10px;">
+                        <button id="join-room-btn" onclick="joinRoom()">JOIN TABLE</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rules">
+                <h3>RULES</h3>
+                <ul>
+                    <li>Discard pairs of SAME COLOR to survive.</li>
+                    <li>Draw cards from your neighbor (the player to your right).</li>
+                    <li>OBJECTIVE: Be the last one holding the JOKER.</li>
+                    <li>WARNING: Losing the JOKER causes ELIMINATION.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Screen 2: LOBBY SCREEN -->
+        <div id="lobby-screen" class="screen hidden">
+            <h2 class="subtitle">GAME LOBBY</h2>
+            <div class="room-code-display">
+                ROOM CODE: <span id="display-room-code" class="glow-text">----</span>
+            </div>
+
+            <div class="lobby-container">
+                <div class="lobby-players">
+                    <h3>PLAYERS (<span id="player-count">0</span>/8)</h3>
+                    <ul id="players-list">
+                        <!-- Players will be populated here -->
+                    </ul>
+                </div>
+
+                <div class="lobby-controls">
+                    <button id="add-bot-btn" class="host-only hidden" onclick="addBot()">ADD BOT</button>
+                    <button id="start-game-btn" class="host-only hidden" onclick="startGame()">START GAME</button>
+                    <button id="leave-lobby-btn" class="leave-btn" onclick="leaveRoom()">LEAVE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 3: GAMEPLAY SCREEN -->
+        <div id="game-screen" class="screen hidden">
+            <div class="top-bar">
+                <div class="room-indicator">
+                    ROOM: <span id="game-room-code">----</span>
+                </div>
+                <div class="top-middle">
+                    <button id="end-game-btn" class="host-only hidden" onclick="endGame()">END GAME</button>
+                    <button id="leave-game-btn" class="leave-btn" onclick="leaveRoom()">LEAVE</button>
+                </div>
+            </div>
+
+            <!-- Opponent Hands -->
+            <div id="opponents-container" class="opponents-row">
+                <!-- Dynamic Opponent Cards injected by JavaScript -->
+            </div>
+
+            <!-- Center Table (Discard Pile / Live Logs) -->
+            <div class="center-table">
+                <div id="discard-pile" class="table-center"></div>
+                <!-- Dynamic Overlay Message -->
+                <div id="message-area" class="message-overlay hidden"></div>
+                
+                <!-- Live Event Logs overlay -->
+                <div class="game-logs-overlay">
+                    <div class="logs-header">ACTIVITY LOG</div>
+                    <div id="game-logs" class="logs-content">
+                        <!-- Logs will be prepended here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player Hand (Bottom) -->
+            <div id="player-container" class="player-area">
+                <div class="player-info">
+                    <span id="p-name">PLAYER</span>: <span id="p-status">ALIVE</span>
+                </div>
+                <div id="player-hand" class="hand">
+                    <!-- Dynamic Player Cards injected by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 4: GAME OVER SCREEN -->
+        <div id="end-screen" class="screen hidden">
+            <h1 id="end-title">GAME OVER</h1>
+            <p id="end-message"></p>
+            <button onclick="returnToLobby()">BACK TO LOBBY</button>
+        </div>
+    </div>
+
+    <!-- Error/Alert Dialog Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Socket.IO client library -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- Frontend Logic -->
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
