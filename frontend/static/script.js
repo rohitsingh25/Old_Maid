@@ -7,7 +7,7 @@
 
 // Connection Setup
 // If on localhost/127.0.0.1, connect to local root. Otherwise, connect to saved URL or fallback.
-const DEFAULT_BACKEND = "https://old-maid-backend.onrender.com";
+const DEFAULT_BACKEND = "https://old-maid.onrender.com";
 const savedBackend = localStorage.getItem('joker_backend_url') || DEFAULT_BACKEND;
 const socket = io(
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -38,7 +38,7 @@ socket.on('kicked', () => {
 socket.on('roomCreated', ({ code, playerId }) => {
     myId = playerId;
     roomCode = code;
-    
+
     // Switch screens
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('lobby-screen').classList.remove('hidden');
@@ -48,7 +48,7 @@ socket.on('roomCreated', ({ code, playerId }) => {
 socket.on('roomJoined', ({ code, playerId }) => {
     myId = playerId;
     roomCode = code;
-    
+
     // Switch screens
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('lobby-screen').classList.remove('hidden');
@@ -70,7 +70,7 @@ socket.on('gameStarted', () => {
 socket.on('gameStateUpdated', (state) => {
     currentGameState = state;
     renderGame(state);
-    
+
     if (state.status === 'ended') {
         setTimeout(() => endGame(state.winner), 1500);
     }
@@ -78,7 +78,7 @@ socket.on('gameStateUpdated', (state) => {
 
 socket.on('gameEnded', () => {
     showToast("Host has ended the game. Returning to lobby.");
-    
+
     // Switch screens
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('end-screen').classList.add('hidden');
@@ -103,7 +103,7 @@ function createRoom() {
 function joinRoom() {
     const name = document.getElementById('player-name').value;
     const code = document.getElementById('room-code').value;
-    
+
     if (!name || name.trim() === '') {
         showToast("Please enter your name first.");
         return;
@@ -112,7 +112,7 @@ function joinRoom() {
         showToast("Please enter a valid 4-digit room code.");
         return;
     }
-    
+
     socket.emit('joinRoom', { roomCode: code, playerName: name });
 }
 
@@ -147,7 +147,7 @@ function resetToStartScreen() {
     roomCode = null;
     currentLobbyState = null;
     currentGameState = null;
-    
+
     document.getElementById('lobby-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('end-screen').classList.add('hidden');
@@ -161,17 +161,17 @@ function resetToStartScreen() {
  */
 function renderLobby(lobby) {
     document.getElementById('player-count').innerText = lobby.players.length;
-    
+
     const playersList = document.getElementById('players-list');
     playersList.innerHTML = '';
-    
+
     // Find if current player is host
     const me = lobby.players.find(p => p.socketId === socket.id);
     const isMeHost = me ? me.isHost : false;
-    
+
     lobby.players.forEach(p => {
         const li = document.createElement('li');
-        
+
         let badges = '';
         if (p.isHost) {
             badges += `<span class="host-badge">HOST</span> `;
@@ -179,12 +179,12 @@ function renderLobby(lobby) {
         if (p.isBot) {
             badges += `<span class="bot-badge">BOT</span>`;
         }
-        
+
         let kickBtn = '';
         if (isMeHost && p.socketId !== socket.id) {
             kickBtn = `<button class="kick-btn" onclick="removePlayer('${p.id}')">REMOVE</button>`;
         }
-        
+
         li.innerHTML = `
             <div class="player-name-wrapper">
                 ${badges}
@@ -194,7 +194,7 @@ function renderLobby(lobby) {
         `;
         playersList.appendChild(li);
     });
-    
+
     // Toggle host buttons
     const hostControls = document.querySelectorAll('.host-only');
     hostControls.forEach(el => {
@@ -213,12 +213,12 @@ function renderGame(state) {
     // Find my representation in players
     const me = state.players.find(p => p.socketId === socket.id);
     if (!me) return;
-    
+
     // Opponents are players that are not me
     const opponents = state.players.filter(p => p.socketId !== socket.id);
     const isMyTurn = state.isMyTurn;
     const targetPlayerId = state.targetPlayerId;
-    
+
     // --- Update turn panels style ---
     const playerArea = document.getElementById('player-container');
     if (isMyTurn) {
@@ -226,30 +226,30 @@ function renderGame(state) {
     } else {
         playerArea.classList.remove('is-turn');
     }
-    
+
     // --- Render Opponent Hands ---
     const opponentsContainer = document.getElementById('opponents-container');
     opponentsContainer.innerHTML = '';
-    
+
     opponents.forEach(opp => {
         const isTarget = (opp.id === targetPlayerId);
         const isOppTurn = (state.currentTurnId === opp.id);
-        
+
         // Mode: 'expanded' if it's my turn and this opponent is the target, else 'deck'
         let handMode = 'deck';
         if (isMyTurn && isTarget) handMode = 'expanded';
-        
+
         const div = document.createElement('div');
         div.className = `opponent ${opp.isOut ? 'out' : ''} ${opp.eliminated ? 'eliminated-bot' : ''} ${isOppTurn ? 'is-turn' : ''}`;
-        
+
         let handHtml = '';
         const cardClass = (isMyTurn && isTarget) ? "card back interactive" : "card back";
         const cursorStyle = (isMyTurn && isTarget) ? "cursor: pointer;" : "";
-        
+
         // Render Cards (backed or expanded)
         for (let i = 0; i < opp.cardCount; i++) {
             const onClick = (isMyTurn && isTarget) ? `onclick="drawCard()"` : '';
-            
+
             let style = '';
             if (handMode === 'expanded') {
                 style = `${cursorStyle}`;
@@ -258,19 +258,19 @@ function renderGame(state) {
             }
             handHtml += `<div class="${cardClass}" style="${style}" ${onClick}></div>`;
         }
-        
+
         let status = opp.cardCount + " CARDS";
         if (opp.eliminated) {
             status = "ELIMINATED";
         } else if (opp.isOut) {
             status = "SAFE";
         }
-        
+
         let avatarEmoji = '👤';
         if (opp.isBot) avatarEmoji = '🤖';
         if (opp.eliminated) avatarEmoji = '💀';
         if (opp.isOut && !opp.eliminated) avatarEmoji = '🏆';
-        
+
         div.innerHTML = `
             <div class="bot-avatar-display">${avatarEmoji}</div>
             <div class="bot-name-label">${escapeHtml(opp.name)}</div>
@@ -281,21 +281,21 @@ function renderGame(state) {
         `;
         opponentsContainer.appendChild(div);
     });
-    
+
     // --- Render Player Hand ---
     const playerHand = document.getElementById('player-hand');
     playerHand.innerHTML = '';
-    
+
     me.hand.forEach((card, index) => {
         const isJoker = card === 'JOKER';
         const className = isJoker ? 'card joker' : 'card';
         let content = '';
-        
+
         if (!isJoker) {
             const [rank, suit] = card.split('-');
             const color = (suit === 'H' || suit === 'D') ? 'card-red' : 'card-black';
             const suitIcon = { 'H': '♥', 'D': '♦', 'C': '♣', 'S': '♠' }[suit];
-            
+
             content = `
                 <div class="card-content-top ${color}">
                     <span class="card-rank">${rank}</span>
@@ -308,21 +308,21 @@ function renderGame(state) {
                 </div>
             `;
         }
-        
+
         const cardDiv = document.createElement('div');
         cardDiv.className = className;
         cardDiv.innerHTML = content;
-        
+
         // Fan Effect
         const total = me.hand.length;
         const rot = (index - total / 2) * 5;
         const y = Math.abs(rot) * 2;
         cardDiv.style.setProperty('--rot', `${rot}deg`);
         cardDiv.style.setProperty('--y', `${y}px`);
-        
+
         playerHand.appendChild(cardDiv);
     });
-    
+
     // Update Player Info Text
     document.getElementById('p-name').innerText = me.name;
     const statusEl = document.getElementById('p-status');
@@ -335,16 +335,16 @@ function renderGame(state) {
         statusEl.style.color = me.isOut ? "#555" : "#00f3ff";
         statusEl.style.textShadow = me.isOut ? "none" : "0 0 5px #00f3ff";
     }
-    
+
     // --- Render Discard Pile ---
     const discardDiv = document.getElementById('discard-pile');
     discardDiv.innerHTML = '';
-    
+
     if (state.discardPile) {
         state.discardPile.forEach((card, i) => {
             const el = document.createElement('div');
             el.className = 'discard-card';
-            
+
             let content = '';
             let color = '';
             if (card === 'JOKER') {
@@ -355,7 +355,7 @@ function renderGame(state) {
                 const suitIcons = { 'H': '♥', 'D': '♦', 'C': '♣', 'S': '♠' };
                 const colorClass = (suit === 'H' || suit === 'D') ? 'card-red' : 'card-black';
                 const suitIcon = suitIcons[suit];
-                
+
                 content = `
                     <div class="card-content-top ${colorClass}">
                         <span class="card-rank">${rank}</span>
@@ -368,21 +368,21 @@ function renderGame(state) {
                     </div>
                 `;
             }
-            
+
             el.innerHTML = content;
             if (color) el.style.color = color;
-            
+
             // Random scatter
             const seed = (card.charCodeAt(0) + i * 50);
             const rot = (seed % 60) - 30;
             const x = (seed % 30) - 15;
             const y = ((seed * 2) % 30) - 15;
             el.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg)`;
-            
+
             discardDiv.appendChild(el);
         });
     }
-    
+
     // --- Render Live Logs ---
     const logsContainer = document.getElementById('game-logs');
     logsContainer.innerHTML = '';
@@ -399,7 +399,7 @@ function renderGame(state) {
             logsContainer.appendChild(logDiv);
         });
     }
-    
+
     // Toggle host gameplay controls
     const isMeHost = me.isHost;
     const hostGameControls = document.querySelectorAll('#game-screen .host-only');
@@ -434,7 +434,7 @@ function formatCardForMessage(c) {
  */
 function handleDrawNotification(data) {
     const el = document.getElementById('message-area');
-    
+
     let messageHtml = "";
     if (data.jokerSnatched) {
         el.classList.add('joker-snatch');
@@ -443,16 +443,16 @@ function handleDrawNotification(data) {
         el.classList.remove('joker-snatch');
         messageHtml = `${escapeHtml(data.drawerName)} drew ${formatCardForMessage(data.cardDrawn)} from ${escapeHtml(data.targetName)}`;
     }
-    
+
     showMessage(messageHtml);
-    
+
     // If pairs were removed, queue another message shortly after
     if (data.removedPairs && data.removedPairs.length > 0) {
         setTimeout(() => {
             let pairsHtml = "DISCARDED PAIRS:<br>";
             for (let i = 0; i < data.removedPairs.length; i += 2) {
                 const c1 = formatCardForMessage(data.removedPairs[i]);
-                const c2 = formatCardForMessage(data.removedPairs[i+1]);
+                const c2 = formatCardForMessage(data.removedPairs[i + 1]);
                 pairsHtml += `${c1} & ${c2}<br>`;
             }
             showMessage(pairsHtml);
@@ -483,14 +483,14 @@ function showMessage(htmlContent) {
 function endGame(winner) {
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('end-screen').classList.remove('hidden');
-    
+
     // Find my player details
     const me = currentGameState ? currentGameState.players.find(p => p.socketId === socket.id) : null;
     const amIWinner = me ? me.name === winner : false;
-    
+
     const title = document.getElementById('end-title');
     const msg = document.getElementById('end-message');
-    
+
     if (amIWinner) {
         title.innerText = "GAME CLEAR";
         title.style.color = "var(--primary-cyan)";
@@ -510,7 +510,7 @@ function showToast(msg) {
     const toast = document.getElementById('toast');
     toast.innerText = msg;
     toast.classList.remove('hidden');
-    
+
     // Auto hide after 3.5s
     setTimeout(() => {
         toast.classList.add('hidden');
@@ -519,11 +519,11 @@ function showToast(msg) {
 
 function escapeHtml(unsafe) {
     return unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 // Quick reload support for testing (if pressed 'R' outside input)
