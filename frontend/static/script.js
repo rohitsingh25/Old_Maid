@@ -381,11 +381,19 @@ function renderGame(state) {
         cardDiv.style.setProperty('--rot', `${rot}deg`);
         cardDiv.style.setProperty('--y', `${y}px`);
 
-        // Dynamically adjust card overlap based on total card count to prevent overflowing
+        // Dynamically adjust card overlap based on total card count to prevent overflowing, adapting for mobile
         let margin = -25;
-        if (total > 10) margin = -35;
-        if (total > 14) margin = -42;
-        if (total > 18) margin = -48;
+        const isMobile = window.innerWidth <= 600;
+        if (isMobile) {
+            margin = -16;
+            if (total > 10) margin = -22;
+            if (total > 14) margin = -27;
+            if (total > 18) margin = -31;
+        } else {
+            if (total > 10) margin = -35;
+            if (total > 14) margin = -42;
+            if (total > 18) margin = -48;
+        }
         cardDiv.style.margin = `0 ${margin}px`;
 
         playerHand.appendChild(cardDiv);
