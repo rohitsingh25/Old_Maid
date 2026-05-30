@@ -529,7 +529,7 @@ io.on('connection', (socket) => {
     
     addLog(rooms[code].logs, `${playerName} created the room.`);
     
-    socket.emit('roomCreated', { code, playerId: socket.id });
+    socket.emit('roomCreated', { code, playerId: rooms[code].players[0].id });
     broadcastLobby(rooms[code]);
     broadcastActiveRoomsCount();
   });
@@ -561,7 +561,7 @@ io.on('connection', (socket) => {
       return socket.emit('errorMsg', `Name "${normalizedName}" is already taken in this room.`);
     }
     
-    room.players.push({
+    const newPlayer = {
       id: 'player_' + Math.random().toString(36).substr(2, 9),
       socketId: socket.id,
       name: normalizedName,
@@ -569,19 +569,20 @@ io.on('connection', (socket) => {
       hand: [],
       eliminated: false,
       isHost: false
-    });
+    };
+    room.players.push(newPlayer);
     
     socket.join(code);
     socket.roomCode = code;
     
     addLog(room.logs, `${normalizedName} joined the room.`);
     
-    socket.emit('roomJoined', { code, playerId: socket.id });
+    socket.emit('roomJoined', { code, playerId: newPlayer.id });
     broadcastLobby(room);
   });
   
   // Event: Add Bot
-  socket.on('addBot', () => {
+  socket.on('addBot', ({ botName }) => {
     const code = socket.roomCode;
     const room = rooms[code];
     if (!room || room.status !== 'lobby') return;
@@ -594,28 +595,34 @@ io.on('connection', (socket) => {
       return socket.emit('errorMsg', 'Room is full (max 8 players).');
     }
     
-    const botPool = ['Arisu', 'Usagi', 'Cheshire', 'Kuina', 'Aguni', 'Niragi', 'Ann', 'Hatter'];
-    // Filter out names already taken in the room
-    const availableNames = botPool.filter(name => !room.players.some(p => p.name.toLowerCase() === name.toLowerCase()));
+    let finalBotName = botName ? botName.trim().substring(0, 12) : '';
+    if (!finalBotName) {
+      const botPool = ['Arisu', 'Usagi', 'Cheshire', 'Kuina', 'Aguni', 'Niragi', 'Ann', 'Hatter'];
+      const availableNames = botPool.filter(name => !room.players.some(p => p.name.toLowerCase() === name.toLowerCase()));
+      if (availableNames.length > 0) {
+        finalBotName = availableNames[Math.floor(Math.random() * availableNames.length)];
+      } else {
+        finalBotName = `Bot ${room.players.filter(p => p.isBot).length + 1}`;
+      }
+    }
     
-    let botName;
-    if (availableNames.length > 0) {
-      botName = availableNames[Math.floor(Math.random() * availableNames.length)];
-    } else {
-      botName = `Bot ${room.players.filter(p => p.isBot).length + 1}`;
+    // Validate if name is already taken
+    const nameExists = room.players.some(p => p.name.toLowerCase() === finalBotName.toLowerCase());
+    if (nameExists) {
+      return socket.emit('errorMsg', `Name "${finalBotName}" is already taken in this room.`);
     }
     
     room.players.push({
       id: 'bot_' + Math.random().toString(36).substr(2, 9),
       socketId: null,
-      name: botName,
+      name: finalBotName,
       isBot: true,
       hand: [],
       eliminated: false,
       isHost: false
     });
     
-    addLog(room.logs, `Bot "${botName}" added to the lobby.`);
+    addLog(room.logs, `Bot "${finalBotName}" added to the lobby.`);
     broadcastLobby(room);
   });
   
@@ -663,8 +670,8 @@ io.on('connection', (socket) => {
     const player = room.players.find(p => p.socketId === socket.id);
     if (!player || !player.isHost) return;
     
-    if (room.players.length < 2) {
-      return socket.emit('errorMsg', 'Need at least 2 players to start.');
+    if (room.players.length < 4) {
+      return socket.emit('errorMsg', 'Need at least 4 players to start.');
     }
     
     // Setup and Deal

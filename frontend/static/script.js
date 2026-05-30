@@ -124,7 +124,10 @@ function joinRoom() {
 }
 
 function addBot() {
-    socket.emit('addBot');
+    const nextBotNum = currentLobbyState ? currentLobbyState.players.filter(p => p.isBot).length + 1 : 1;
+    const botName = prompt("Enter Bot Name:", "Bot " + nextBotNum);
+    if (botName === null) return; // User cancelled
+    socket.emit('addBot', { botName: botName.trim() });
 }
 
 function removePlayer(playerId) {
@@ -173,7 +176,7 @@ function renderLobby(lobby) {
     playersList.innerHTML = '';
 
     // Find if current player is host
-    const me = lobby.players.find(p => p.socketId === socket.id);
+    const me = lobby.players.find(p => p.id === myId);
     const isMeHost = me ? me.isHost : false;
 
     lobby.players.forEach(p => {
@@ -188,7 +191,7 @@ function renderLobby(lobby) {
         }
 
         let kickBtn = '';
-        if (isMeHost && p.socketId !== socket.id) {
+        if (isMeHost && p.id !== myId) {
             kickBtn = `<button class="kick-btn" onclick="removePlayer('${p.id}')">REMOVE</button>`;
         }
 
@@ -218,11 +221,11 @@ function renderLobby(lobby) {
  */
 function renderGame(state) {
     // Find my representation in players
-    const me = state.players.find(p => p.socketId === socket.id);
+    const me = state.players.find(p => p.id === myId);
     if (!me) return;
 
     // Opponents are players that are not me
-    const opponents = state.players.filter(p => p.socketId !== socket.id);
+    const opponents = state.players.filter(p => p.id !== myId);
     const isMyTurn = state.isMyTurn;
     const targetPlayerId = state.targetPlayerId;
 
@@ -492,7 +495,7 @@ function endGame(winner) {
     document.getElementById('end-screen').classList.remove('hidden');
 
     // Find my player details
-    const me = currentGameState ? currentGameState.players.find(p => p.socketId === socket.id) : null;
+    const me = currentGameState ? currentGameState.players.find(p => p.id === myId) : null;
     const amIWinner = me ? me.name === winner : false;
 
     const title = document.getElementById('end-title');
