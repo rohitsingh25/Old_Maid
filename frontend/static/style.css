@@ -594,6 +594,7 @@ input:focus {
     padding: 8px;
     border-radius: 8px;
     border: 1px solid transparent;
+    min-width: 95px;
 }
 
 .opponent.is-turn {
@@ -629,7 +630,7 @@ input:focus {
 /* Deck Mode Card Styles (Stacked) */
 .opponent-hand.deck .card {
     position: absolute;
-    margin-left: 0;
+    margin: 0 !important;
     width: 60px;
     height: 90px;
     background-size: cover;
@@ -1245,6 +1246,7 @@ input:focus {
     .opponent {
         padding: 4px;
         border-radius: 6px;
+        min-width: 75px;
     }
     .bot-avatar-display {
         width: 28px;
@@ -1264,6 +1266,7 @@ input:focus {
     .opponent-hand.deck .card {
         width: 40px;
         height: 60px;
+        margin: 0 !important;
     }
 
     /* 5. Center Table Stack */
