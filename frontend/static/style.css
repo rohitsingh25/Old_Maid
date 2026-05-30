@@ -354,6 +354,21 @@ input:focus {
     letter-spacing: 2px;
 }
 
+.lobby-wait-message {
+    margin-top: 15px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    color: var(--primary-cyan);
+    text-shadow: 0 0 5px rgba(0, 243, 255, 0.4);
+    animation: blinkText 1.5s infinite alternate;
+    text-align: center;
+}
+
+@keyframes blinkText {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
+}
+
 .lobby-container {
     display: flex;
     gap: 3rem;

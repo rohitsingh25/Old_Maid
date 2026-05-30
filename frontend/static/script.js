@@ -179,6 +179,15 @@ function renderLobby(lobby) {
     const me = lobby.players.find(p => p.id === myId);
     const isMeHost = me ? me.isHost : false;
 
+    const waitMsgEl = document.getElementById('lobby-wait-msg');
+    if (waitMsgEl) {
+        if (isMeHost) {
+            waitMsgEl.classList.add('hidden');
+        } else {
+            waitMsgEl.classList.remove('hidden');
+        }
+    }
+
     lobby.players.forEach(p => {
         const li = document.createElement('li');
 
