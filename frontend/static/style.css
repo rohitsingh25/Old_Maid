@@ -503,35 +503,34 @@ input:focus {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 30px;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
-    position: absolute;
-    top: 0;
+    padding: 10px 25px;
+    background: rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     box-sizing: border-box;
     z-index: 100;
 }
 
 .room-indicator {
     font-family: 'Orbitron';
-    font-size: 1.1rem;
-    color: #aaa;
+    font-size: 1rem;
+    color: #888;
     letter-spacing: 1px;
 }
 
 .room-indicator span {
     color: var(--primary-cyan);
-    text-shadow: 0 0 8px var(--primary-cyan);
+    text-shadow: 0 0 5px var(--primary-cyan);
     font-weight: bold;
 }
 
 .top-middle {
     display: flex;
-    gap: 15px;
+    gap: 12px;
 }
 
 .top-middle button {
-    font-size: 0.8rem;
-    padding: 8px 20px;
+    font-size: 0.75rem;
+    padding: 6px 15px;
     width: auto;
 }
 
@@ -543,33 +542,32 @@ input:focus {
 #end-game-btn:hover {
     background: var(--primary-red);
     color: black;
-    box-shadow: 0 0 20px var(--primary-red);
+    box-shadow: 0 0 15px var(--primary-red);
 }
 
 #leave-game-btn {
-    border-color: #666;
+    border-color: #555;
     color: #888;
 }
 
 #leave-game-btn:hover {
-    background: #666;
+    background: #555;
     color: white;
-    box-shadow: 0 0 15px #666;
+    box-shadow: 0 0 10px #555;
 }
 
 /* =========================================
-   OPPONENTS AREA (Arranged gracefully)
+   OPPONENTS AREA (Compact layout)
    ========================================= */
 #opponents-container {
-    flex: 1;
     display: flex;
     flex-flow: row wrap;
     justify-content: center;
     align-items: flex-start;
-    gap: 25px 40px;
+    gap: 15px 25px;
     max-width: 95%;
     margin: 0 auto;
-    padding-top: 80px;
+    padding-top: 15px;
     z-index: 20;
     pointer-events: none;
 }
@@ -582,33 +580,19 @@ input:focus {
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: all 0.4s ease;
-    opacity: 0.75;
+    transition: all 0.3s ease;
+    opacity: 0.7;
     position: relative;
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid transparent;
 }
 
 .opponent.is-turn {
     opacity: 1;
-    transform: scale(1.05);
-}
-
-.opponent.is-turn::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: -15px;
-    right: -15px;
-    bottom: -10px;
-    border: 1px solid var(--primary-cyan);
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0, 243, 255, 0.4), inset 0 0 10px rgba(0, 243, 255, 0.2);
-    pointer-events: none;
-    animation: pulseBorder 1.5s infinite alternate;
-}
-
-@keyframes pulseBorder {
-    from { opacity: 0.4; }
-    to { opacity: 1; }
+    border-color: rgba(0, 243, 255, 0.3);
+    background: rgba(0, 243, 255, 0.05);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
 }
 
 .opponent.out {
@@ -616,20 +600,34 @@ input:focus {
 }
 
 .opponent.eliminated-bot {
-    opacity: 0.3;
-    filter: grayscale(100%) brightness(0.5);
+    opacity: 0.25;
+    filter: grayscale(100%) brightness(0.4);
 }
 
-/* DECK MODE - Default for non-active/non-target bots */
+/* DECK MODE - Stacked Opponent Hands */
 .opponent-hand {
     display: flex;
     justify-content: center;
-    height: 140px;
+    height: 100px; /* Reduced height */
     perspective: 1000px;
-    transition: all 0.4s ease;
+    transition: all 0.3s ease;
 }
 
-/* EXPANDED MODE - Selection View */
+.opponent-hand.deck {
+    width: 60px !important; /* Smaller opponent cards */
+}
+
+/* Deck Mode Card Styles (Stacked) */
+.opponent-hand.deck .card {
+    position: absolute;
+    margin-left: 0;
+    width: 60px;
+    height: 90px;
+    background-size: cover;
+    transform: rotate(var(--deck-rot)) translateX(var(--deck-x)) !important;
+}
+
+/* EXPANDED MODE - Card Selection Modal */
 .opponent-hand.expanded {
     position: fixed;
     top: 50%;
@@ -652,19 +650,15 @@ input:focus {
     border-radius: 8px;
 }
 
-.opponent-hand.deck {
-    width: var(--card-width) !important;
-}
-
 /* Expanded Mode Card Styles */
 .opponent-hand.expanded .card {
     position: static !important;
     transform: none !important;
     margin: 0 !important;
-    width: 130px;
-    height: 195px;
+    width: 120px;
+    height: 180px;
     border: 2px solid var(--primary-cyan);
-    box-shadow: 0 0 20px var(--primary-cyan);
+    box-shadow: 0 0 15px var(--primary-cyan);
     flex-shrink: 0;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -672,34 +666,27 @@ input:focus {
 .opponent-hand.expanded .card:hover {
     transform: scale(1.1) translateY(-10px) !important;
     z-index: 1000;
-    box-shadow: 0 0 45px var(--primary-cyan);
+    box-shadow: 0 0 35px var(--primary-cyan);
     background-color: #2b2b2b;
 }
 
-/* Deck Mode Card Styles (Stacked) */
-.opponent-hand.deck .card {
-    position: absolute;
-    margin-left: 0;
-    transform: rotate(var(--deck-rot)) translateX(var(--deck-x)) !important;
-}
-
 .bot-avatar-display {
-    width: 45px;
-    height: 45px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: #111;
     border: 1px solid #444;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 8px;
-    font-size: 1.3rem;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    margin-bottom: 4px;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
 }
 
 .opponent.is-turn .bot-avatar-display {
     border-color: var(--primary-cyan);
-    box-shadow: 0 0 10px var(--primary-cyan);
+    box-shadow: 0 0 8px var(--primary-cyan);
 }
 
 .opponent.eliminated-bot .bot-avatar-display {
@@ -708,18 +695,18 @@ input:focus {
 
 .bot-name-label {
     font-family: 'Orbitron';
-    font-size: 0.9rem;
-    color: #fff;
-    margin-bottom: 4px;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    font-size: 0.8rem;
+    color: #eee;
+    margin-bottom: 2px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
 }
 
 .bot-status {
-    font-size: 0.8rem;
-    margin-top: 4px;
+    font-size: 0.7rem;
+    margin-top: 2px;
     font-family: 'Orbitron';
     color: var(--primary-cyan);
-    text-shadow: 0 0 5px var(--primary-cyan);
+    text-shadow: 0 0 3px var(--primary-cyan);
     font-weight: bold;
 }
 
@@ -730,31 +717,96 @@ input:focus {
 
 .opponent.eliminated-bot .bot-status {
     color: var(--primary-red);
-    text-shadow: 0 0 5px var(--primary-red);
+    text-shadow: 0 0 3px var(--primary-red);
 }
 
 /* =========================================
-   CENTER TABLE & LOGS PANEL
+   CENTER AREA: Table, Survivors & Logs (Grid columns to avoid overlaps)
    ========================================= */
 .center-table {
-    flex: 1;
-    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
     width: 100%;
-    min-height: 250px;
+    flex: 1;
+    padding: 10px 40px;
+    box-sizing: border-box;
+    min-height: 220px;
+    gap: 20px;
+}
+
+.game-status-panel, .game-logs-overlay {
+    width: 260px;
+    height: 90%;
+    max-height: 220px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 243, 255, 0.15);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Roboto Mono', monospace;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    box-sizing: border-box;
+}
+
+.panel-header, .logs-header {
+    background: rgba(0, 243, 255, 0.08);
+    color: var(--primary-cyan);
+    padding: 6px 12px;
+    font-family: 'Orbitron';
+    font-weight: bold;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(0, 243, 255, 0.15);
+}
+
+.panel-content, .logs-content {
+    flex: 1;
+    padding: 8px 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.7rem;
+    color: #888;
+    text-align: left;
+}
+
+/* Survivor details */
+.survivor-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 5px;
+    border-radius: 3px;
+    border: 1px solid transparent;
+}
+
+.survivor-item.active-turn {
+    border-color: rgba(0, 243, 255, 0.25);
+    background: rgba(0, 243, 255, 0.05);
+    color: #fff;
+}
+
+.survivor-item.safe {
+    color: #00ff66;
+}
+
+.survivor-item.eliminated {
+    color: var(--primary-red);
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+/* Center pile wrapper */
+.table-center {
+    position: relative;
+    width: 180px;
+    height: 180px;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 5;
-}
-
-.table-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 250px;
-    height: 250px;
-    pointer-events: none;
 }
 
 .discard-card {
@@ -771,11 +823,11 @@ input:focus {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 10px;
+    padding: 8px;
     box-sizing: border-box;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
     font-family: 'Roboto Mono', monospace;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: bold;
     color: white;
     transition: all 0.3s;
@@ -786,13 +838,13 @@ input:focus {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     font-family: 'Orbitron';
     color: white;
     background: rgba(0, 0, 0, 0.95);
-    padding: 30px 60px;
+    padding: 20px 45px;
     border: 2px solid var(--primary-cyan);
-    box-shadow: 0 0 50px var(--primary-cyan);
+    box-shadow: 0 0 40px var(--primary-cyan);
     z-index: 200;
     pointer-events: none;
     text-align: center;
@@ -801,67 +853,25 @@ input:focus {
 
 .message-overlay.joker-snatch {
     border-color: var(--primary-red);
-    box-shadow: 0 0 50px var(--primary-red);
-}
-
-/* Semi-transparent Cyberpunk Log Terminal on the Side */
-.game-logs-overlay {
-    position: absolute;
-    right: 30px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 280px;
-    height: 200px;
-    background: rgba(0, 0, 0, 0.7);
-    border: 1px solid rgba(0, 243, 255, 0.2);
-    border-radius: 4px;
-    display: flex;
-    flex-direction: column;
-    font-family: 'Roboto Mono', monospace;
-    font-size: 0.75rem;
-    color: #888;
-    backdrop-filter: blur(5px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    pointer-events: auto;
-}
-
-.logs-header {
-    background: rgba(0, 243, 255, 0.1);
-    color: var(--primary-cyan);
-    padding: 6px 12px;
-    font-family: 'Orbitron';
-    font-weight: bold;
-    font-size: 0.8rem;
-    letter-spacing: 1px;
-    border-bottom: 1px solid rgba(0, 243, 255, 0.2);
-}
-
-.logs-content {
-    flex: 1;
-    padding: 10px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    text-align: left;
+    box-shadow: 0 0 40px var(--primary-red);
 }
 
 .logs-content div {
-    line-height: 1.3;
+    line-height: 1.25;
 }
 
 /* =========================================
-   PLAYER & HAND AREA
+   PLAYER & HAND AREA (Bottom)
    ========================================= */
 .player-area {
-    height: 260px;
+    height: 195px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
     background: linear-gradient(0deg, rgba(0, 0, 0, 0.95) 0%, transparent 100%);
     width: 100%;
-    padding-bottom: 15px;
+    padding-bottom: 10px;
     box-sizing: border-box;
     z-index: 25;
 }

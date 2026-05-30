@@ -339,6 +339,13 @@ function renderGame(state) {
         cardDiv.style.setProperty('--rot', `${rot}deg`);
         cardDiv.style.setProperty('--y', `${y}px`);
 
+        // Dynamically adjust card overlap based on total card count to prevent overflowing
+        let margin = -25;
+        if (total > 10) margin = -35;
+        if (total > 14) margin = -42;
+        if (total > 18) margin = -48;
+        cardDiv.style.margin = `0 ${margin}px`;
+
         playerHand.appendChild(cardDiv);
     });
 
@@ -416,6 +423,33 @@ function renderGame(state) {
             }
             logDiv.innerText = log;
             logsContainer.appendChild(logDiv);
+        });
+    }
+
+    // --- Render Survivors List ---
+    const survivorsList = document.getElementById('game-survivors-list');
+    if (survivorsList && state.players) {
+        survivorsList.innerHTML = '';
+        state.players.forEach(p => {
+            const div = document.createElement('div');
+            const isPMe = p.id === myId;
+            const isPTurn = state.currentTurnId === p.id;
+            div.className = `survivor-item ${p.eliminated ? 'eliminated' : ''} ${p.isOut ? 'safe' : ''} ${isPTurn ? 'active-turn' : ''}`;
+            
+            let statusBadge = 'ALIVE';
+            if (p.eliminated) statusBadge = 'DEAD 💀';
+            else if (p.isOut) statusBadge = 'SAFE 🏆';
+            else if (isPTurn) statusBadge = 'TURN ⚡';
+            
+            let countText = p.cardCount + ' cards';
+            if (p.eliminated) countText = 'ELIMINATED';
+            else if (p.isOut) countText = 'SAFE';
+            
+            div.innerHTML = `
+                <span class="survivor-name">${escapeHtml(p.name)} ${isPMe ? '(You)' : ''}</span>
+                <span class="survivor-status" style="font-weight: bold;">${statusBadge} (${countText})</span>
+            `;
+            survivorsList.appendChild(div);
         });
     }
 
