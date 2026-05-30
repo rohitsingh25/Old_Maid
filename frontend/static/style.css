@@ -635,47 +635,102 @@ input:focus {
     transform: rotate(var(--deck-rot)) translateX(var(--deck-x)) !important;
 }
 
-/* EXPANDED MODE - Card Selection Modal */
-.opponent-hand.expanded {
+/* EXPANDED MODE - Card Selection Modal Overlay */
+.card-selection-modal {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90vw !important;
-    height: 60vh !important;
-    background: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(15px);
-    border: 2px solid var(--primary-cyan);
-    box-shadow: 0 0 50px rgba(0, 243, 255, 0.5);
-    z-index: 999;
-    padding: 20px;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(5, 5, 5, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 500;
     display: flex;
-    flex-wrap: nowrap;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    gap: 15px;
-    overflow-x: auto;
-    border-radius: 8px;
+    justify-content: center;
+    gap: 30px;
+    animation: fadeIn 0.3s ease forwards;
 }
 
-/* Expanded Mode Card Styles */
-.opponent-hand.expanded .card {
+.selection-modal-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    z-index: 510;
+}
+
+.selection-target-name-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.6rem;
+    color: white;
+    text-shadow: 0 0 10px var(--primary-cyan);
+    letter-spacing: 2px;
+}
+
+.selection-instruction {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    color: #888;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.selection-cards-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    width: 90%;
+    max-width: 1200px;
+    padding: 20px;
+    overflow-x: auto;
+    z-index: 510;
+}
+
+.selection-cards-row::-webkit-scrollbar {
+    height: 6px;
+}
+
+.selection-cards-row::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.selection-cards-row::-webkit-scrollbar-thumb {
+    background: var(--primary-cyan);
+    border-radius: 3px;
+    box-shadow: 0 0 5px var(--primary-cyan);
+}
+
+.selection-cards-row .card {
     position: static !important;
     transform: none !important;
     margin: 0 !important;
-    width: 120px;
-    height: 180px;
-    border: 2px solid var(--primary-cyan);
-    box-shadow: 0 0 15px var(--primary-cyan);
+    width: 110px;
+    height: 165px;
+    border: 1px solid var(--primary-cyan);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
     flex-shrink: 0;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s;
 }
 
-.opponent-hand.expanded .card:hover {
+.selection-cards-row .card:hover {
     transform: scale(1.1) translateY(-10px) !important;
-    z-index: 1000;
     box-shadow: 0 0 35px var(--primary-cyan);
+    border-color: #fff;
     background-color: #2b2b2b;
+}
+
+.opponent-hand:empty {
+    display: none !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .bot-avatar-display {

@@ -157,7 +157,7 @@ function leaveRoom() {
     resetToStartScreen();
 }
 
-function endGame() {
+function hostEndGame() {
     socket.emit('endGame');
 }
 
@@ -266,32 +266,21 @@ function renderGame(state) {
     opponents.forEach(opp => {
         const isTarget = (opp.id === targetPlayerId);
         const isOppTurn = (state.currentTurnId === opp.id);
-
-        // Mode: 'expanded' if it's my turn and this opponent is the target, else 'deck'
-        let handMode = 'deck';
-        if (isMyTurn && isTarget) handMode = 'expanded';
+        const handMode = 'deck';
 
         const div = document.createElement('div');
         div.className = `opponent ${opp.isOut ? 'out' : ''} ${opp.eliminated ? 'eliminated-bot' : ''} ${isOppTurn ? 'is-turn' : ''}`;
 
         let handHtml = '';
-        const cardClass = (isMyTurn && isTarget) ? "card back interactive" : "card back";
-        const cursorStyle = (isMyTurn && isTarget) ? "cursor: pointer;" : "";
+        const cardClass = "card back";
 
         // Render Cards (backed or expanded)
-        // If it is the user's turn, but this opponent is NOT the target, hide their cards completely
-        const shouldHideCards = isMyTurn && !isTarget;
+        // If it is the user's turn, hide all card backs on the board since drawing is done via overlay modal
+        const shouldHideCards = isMyTurn;
         if (!shouldHideCards) {
             for (let i = 0; i < opp.cardCount; i++) {
-                const onClick = (isMyTurn && isTarget) ? `onclick="drawCard()"` : '';
-
-                let style = '';
-                if (handMode === 'expanded') {
-                    style = `${cursorStyle}`;
-                } else {
-                    style = `--deck-rot: ${(i % 5) - 2}deg; --deck-x: ${(i % 3) - 1}px;`;
-                }
-                handHtml += `<div class="${cardClass}" style="${style}" ${onClick}></div>`;
+                const style = `--deck-rot: ${(i % 5) - 2}deg; --deck-x: ${(i % 3) - 1}px;`;
+                handHtml += `<div class="${cardClass}" style="${style}"></div>`;
             }
         }
 
@@ -310,13 +299,49 @@ function renderGame(state) {
         div.innerHTML = `
             <div class="bot-avatar-display">${avatarEmoji}</div>
             <div class="bot-name-label">${escapeHtml(opp.name)}</div>
-            <div class="opponent-hand ${handMode}">
-                ${handHtml}
-            </div>
+            <div class="opponent-hand ${handMode}">${handHtml}</div>
             <div class="bot-status">${status}</div>
         `;
         opponentsContainer.appendChild(div);
     });
+
+    // --- Render Card Selection Modal ---
+    const selectionModal = document.getElementById('card-selection-modal');
+    if (selectionModal) {
+        if (isMyTurn && targetPlayerId && state.status === 'playing') {
+            const targetOpp = opponents.find(opp => opp.id === targetPlayerId);
+            if (targetOpp) {
+                // Update target player details
+                const targetAvatar = document.getElementById('selection-target-avatar');
+                const targetName = document.getElementById('selection-target-name');
+                if (targetAvatar) {
+                    let avatarEmoji = '👤';
+                    if (targetOpp.isBot) avatarEmoji = '🤖';
+                    targetAvatar.innerText = avatarEmoji;
+                }
+                if (targetName) {
+                    targetName.innerText = targetOpp.name;
+                }
+
+                // Render selection cards
+                const container = document.getElementById('selection-cards-container');
+                if (container) {
+                    container.innerHTML = '';
+                    for (let i = 0; i < targetOpp.cardCount; i++) {
+                        const cardDiv = document.createElement('div');
+                        cardDiv.className = 'card back interactive';
+                        cardDiv.onclick = () => drawCard();
+                        container.appendChild(cardDiv);
+                    }
+                }
+                selectionModal.classList.remove('hidden');
+            } else {
+                selectionModal.classList.add('hidden');
+            }
+        } else {
+            selectionModal.classList.add('hidden');
+        }
+    }
 
     // --- Render Player Hand ---
     const playerHand = document.getElementById('player-hand');
@@ -443,8 +468,10 @@ function renderGame(state) {
                 logDiv.innerText = log;
                 logsContainer.appendChild(logDiv);
             });
-            // Auto-scroll to the bottom to display the latest logs
-            logsContainer.scrollTop = logsContainer.scrollHeight;
+            // Auto-scroll to the bottom to display the latest logs (brief timeout to allow layout)
+            setTimeout(() => {
+                logsContainer.scrollTop = logsContainer.scrollHeight;
+            }, 0);
         }
     }
 

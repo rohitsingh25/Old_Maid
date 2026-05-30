@@ -96,7 +96,7 @@
                     ROOM: <span id="game-room-code">----</span>
                 </div>
                 <div class="top-middle">
-                    <button id="end-game-btn" class="host-only hidden" onclick="endGame()">END GAME</button>
+                    <button id="end-game-btn" class="host-only hidden" onclick="hostEndGame()">END GAME</button>
                     <button id="leave-game-btn" class="leave-btn" onclick="leaveRoom()">LEAVE</button>
                 </div>
             </div>
@@ -136,6 +136,18 @@
                 </div>
                 <div id="player-hand" class="hand">
                     <!-- Dynamic Player Cards injected by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Card Selection Modal Overlay -->
+            <div id="card-selection-modal" class="card-selection-modal hidden">
+                <div class="selection-modal-header">
+                    <div id="selection-target-avatar" class="bot-avatar-display">👤</div>
+                    <div id="selection-target-name" class="selection-target-name-label">PLAYER NAME</div>
+                    <div class="selection-instruction">DRAW A CARD FROM THEIR HAND</div>
+                </div>
+                <div id="selection-cards-container" class="selection-cards-row">
+                    <!-- Cards will be populated here -->
                 </div>
             </div>
         </div>

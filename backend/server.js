@@ -427,8 +427,8 @@ function handlePlayerLeave(socket, roomCode) {
     return;
   }
   
-  if (room.status === 'lobby') {
-    // If in lobby, simply remove them
+  if (room.status === 'lobby' || room.status === 'ended') {
+    // If in lobby or ended, simply remove them
     room.players.splice(playerIdx, 1);
     
     if (room.players.length === 0) {
@@ -450,10 +450,15 @@ function handlePlayerLeave(socket, roomCode) {
       }
     }
     
-    broadcastLobby(room);
+    if (room.status === 'lobby') {
+      broadcastLobby(room);
+    } else {
+      broadcastState(room);
+    }
   } else {
-    // If in gameplay, mark them as eliminated and distribute cards
+    // If in gameplay, mark them as eliminated, left = true, and distribute cards
     leavingPlayer.eliminated = true;
+    leavingPlayer.left = true;
     const cardsToDistribute = [...leavingPlayer.hand];
     leavingPlayer.hand = []; // Clear hand
     
@@ -800,6 +805,9 @@ io.on('connection', (socket) => {
       clearTimeout(room.botTimeout);
       room.botTimeout = null;
     }
+    
+    // Filter out players who left during the game
+    room.players = room.players.filter(p => !p.left);
     
     room.status = 'lobby';
     room.players.forEach(p => {
