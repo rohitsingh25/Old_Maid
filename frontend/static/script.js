@@ -85,6 +85,20 @@ socket.on('gameEnded', () => {
     document.getElementById('lobby-screen').classList.remove('hidden');
 });
 
+socket.on('roomReset', () => {
+    showToast("Host reset the room. Returning to lobby.");
+
+    // Switch screens
+    document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('end-screen').classList.add('hidden');
+    document.getElementById('lobby-screen').classList.remove('hidden');
+});
+
+socket.on('roomDisbanded', () => {
+    showToast("Host has left. Room disbanded.");
+    resetToStartScreen();
+});
+
 socket.on('drawNotification', (data) => {
     handleDrawNotification(data);
 });
@@ -147,9 +161,8 @@ function endGame() {
     socket.emit('endGame');
 }
 
-function returnToLobby() {
-    document.getElementById('end-screen').classList.add('hidden');
-    document.getElementById('lobby-screen').classList.remove('hidden');
+function resetRoom() {
+    socket.emit('resetRoom');
 }
 
 function resetToStartScreen() {
@@ -266,16 +279,20 @@ function renderGame(state) {
         const cursorStyle = (isMyTurn && isTarget) ? "cursor: pointer;" : "";
 
         // Render Cards (backed or expanded)
-        for (let i = 0; i < opp.cardCount; i++) {
-            const onClick = (isMyTurn && isTarget) ? `onclick="drawCard()"` : '';
+        // If it is the user's turn, but this opponent is NOT the target, hide their cards completely
+        const shouldHideCards = isMyTurn && !isTarget;
+        if (!shouldHideCards) {
+            for (let i = 0; i < opp.cardCount; i++) {
+                const onClick = (isMyTurn && isTarget) ? `onclick="drawCard()"` : '';
 
-            let style = '';
-            if (handMode === 'expanded') {
-                style = `${cursorStyle}`;
-            } else {
-                style = `--deck-rot: ${(i % 5) - 2}deg; --deck-x: ${(i % 3) - 1}px;`;
+                let style = '';
+                if (handMode === 'expanded') {
+                    style = `${cursorStyle}`;
+                } else {
+                    style = `--deck-rot: ${(i % 5) - 2}deg; --deck-x: ${(i % 3) - 1}px;`;
+                }
+                handHtml += `<div class="${cardClass}" style="${style}" ${onClick}></div>`;
             }
-            handHtml += `<div class="${cardClass}" style="${style}" ${onClick}></div>`;
         }
 
         let status = opp.cardCount + " CARDS";
@@ -411,19 +428,24 @@ function renderGame(state) {
 
     // --- Render Live Logs ---
     const logsContainer = document.getElementById('game-logs');
-    logsContainer.innerHTML = '';
-    if (state.logs) {
-        state.logs.forEach(log => {
-            const logDiv = document.createElement('div');
-            // Stylize warnings/joker snatches
-            if (log.includes('⚡') || log.includes('ELIMINATED')) {
-                logDiv.style.color = 'var(--primary-red)';
-            } else if (log.includes('discarded pair')) {
-                logDiv.style.color = '#ffcc00';
-            }
-            logDiv.innerText = log;
-            logsContainer.appendChild(logDiv);
-        });
+    if (logsContainer) {
+        logsContainer.innerHTML = '';
+        if (state.logs) {
+            // Render logs in chronological order (oldest at top, newest at bottom)
+            const chronologicalLogs = [...state.logs].reverse();
+            chronologicalLogs.forEach(log => {
+                const logDiv = document.createElement('div');
+                if (log.includes('⚡') || log.includes('ELIMINATED')) {
+                    logDiv.style.color = 'var(--primary-red)';
+                } else if (log.includes('discarded pair')) {
+                    logDiv.style.color = '#ffcc00';
+                }
+                logDiv.innerText = log;
+                logsContainer.appendChild(logDiv);
+            });
+            // Auto-scroll to the bottom to display the latest logs
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
     }
 
     // --- Render Survivors List ---
@@ -540,6 +562,7 @@ function endGame(winner) {
     // Find my player details
     const me = currentGameState ? currentGameState.players.find(p => p.id === myId) : null;
     const amIWinner = me ? me.name === winner : false;
+    const isMeHost = me ? me.isHost : false;
 
     const title = document.getElementById('end-title');
     const msg = document.getElementById('end-message');
@@ -554,6 +577,16 @@ function endGame(winner) {
         title.style.color = "var(--primary-red)";
         title.style.textShadow = "0 0 20px var(--primary-red)";
         msg.innerHTML = `SURVIVOR: ${escapeHtml(winner)}<br>YOU HAVE BEEN ELIMINATED.`;
+    }
+
+    // Toggle Host Play Again button on the end screen
+    const playAgainBtn = document.getElementById('end-play-again-btn');
+    if (playAgainBtn) {
+        if (isMeHost) {
+            playAgainBtn.classList.remove('hidden');
+        } else {
+            playAgainBtn.classList.add('hidden');
+        }
     }
 }
 

@@ -119,6 +119,14 @@ body::after {
     z-index: 60;
 }
 
+.end-actions-panel {
+    display: flex;
+    gap: 20px;
+    margin-top: 30px;
+    width: 80%;
+    max-width: 400px;
+}
+
 .hidden {
     display: none !important;
     opacity: 0;

@@ -416,6 +416,17 @@ function handlePlayerLeave(socket, roomCode) {
   const leavingPlayer = room.players[playerIdx];
   addLog(room.logs, `${leavingPlayer.name} has left the game.`);
   
+  // If host leaves, disband the room and kick everyone back to start screen
+  if (leavingPlayer.isHost) {
+    io.to(roomCode).emit('roomDisbanded');
+    if (room.botTimeout) clearTimeout(room.botTimeout);
+    delete rooms[roomCode];
+    broadcastActiveRoomsCount();
+    socket.leave(roomCode);
+    delete socket.roomCode;
+    return;
+  }
+  
   if (room.status === 'lobby') {
     // If in lobby, simply remove them
     room.players.splice(playerIdx, 1);
@@ -772,6 +783,36 @@ io.on('connection', (socket) => {
     addLog(room.logs, `Game was ended early by the host.`);
     
     io.to(code).emit('gameEnded');
+    broadcastLobby(room);
+  });
+  
+  // Event: Reset Room to Lobby (Play Again)
+  socket.on('resetRoom', () => {
+    const code = socket.roomCode;
+    const room = rooms[code];
+    if (!room) return;
+    
+    // Only host can reset
+    const player = room.players.find(p => p.socketId === socket.id);
+    if (!player || !player.isHost) return;
+    
+    if (room.botTimeout) {
+      clearTimeout(room.botTimeout);
+      room.botTimeout = null;
+    }
+    
+    room.status = 'lobby';
+    room.players.forEach(p => {
+      p.hand = [];
+      p.eliminated = false;
+    });
+    room.discardPile = [];
+    room.logs = [];
+    room.winner = null;
+    
+    addLog(room.logs, `Lobby reset by host. Ready for next game.`);
+    
+    io.to(code).emit('roomReset');
     broadcastLobby(room);
   });
   

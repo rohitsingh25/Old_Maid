@@ -144,7 +144,10 @@
         <div id="end-screen" class="screen hidden">
             <h1 id="end-title">GAME OVER</h1>
             <p id="end-message"></p>
-            <button onclick="returnToLobby()">BACK TO LOBBY</button>
+            <div class="end-actions-panel">
+                <button id="end-play-again-btn" class="host-only hidden" onclick="resetRoom()">PLAY AGAIN</button>
+                <button id="end-leave-btn" class="leave-btn" onclick="leaveRoom()">LEAVE TABLE</button>
+            </div>
         </div>
     </div>
 
